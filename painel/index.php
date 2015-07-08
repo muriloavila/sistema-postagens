@@ -1,3 +1,28 @@
+<?php
+    require_once '../system/config.php';
+    require_once '../system/database.php';
+
+    if(isset($_GET['action'])&& isset($_GET['id']) && !empty($_GET['action']) && !empty($_GET['id'])){
+        $id = DBEscape(strip_tags(trim($_GET['id'])));
+
+        switch($_GET['action']){
+            case 1:
+                DBUpDate('posts', array('status' => 1), "id = '{$id}'");
+                break;
+            case 2:
+                DBUpDate('posts', array('status' => 0), "id = '{$id}'");
+                break;
+            case 3:
+                DBDelete('posts', "id = '{$id}'");
+                break;
+        }
+        header('Location: index.php');
+    }
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,30 +35,35 @@
 	<h2>
 		Gerenciar Postagens | <a href="add-post.php" title="Adicionar">Adicionar</a>
 	</h2>
+    <?php
+    $posts = DBRead('posts', 'ORDER BY data DESC');
 
-	<?php for( $i = 1; $i <= 10; $i++ ): ?>
-	
+    if(!$posts)
+        echo "<h2>Nenhuma Postagem Encontrada</h2>";
+    else
+        foreach ($posts as $post):
+    ?>
 	<hr>
 	<h2>
-		<a href="#" title="#">
-			Lorem ipsum dolor sit amet
-		</a>
+		<?php echo $post['titulo']; ?>
 	</h2>
 
 	<p>
-		por <b>Lucas Pires</b>
-		em <b>06/08/2014</b> |
-		Visitas <b>130</b>
+		por <b><?php echo $post['autor']; ?></b>
+		em <b><?php echo date('d/m/Y', strtotime($post['data']));  ?></b> |
+		Visitas <b><?php echo $post['visitas'] ?></b>
 	</p>
 
 	<p>
-		<a href="#" title="Ativar">Ativar</a> |
-		<a href="#" title="Desativar">Desativar</a> |
-		<a href="#" title="Editar">Editar</a> |
-		<a href="#" title="Deletar">Deletar</a>
+        <?php if(!$post['status']){
+            echo '<a href="?action=1&&id='.$post['id'].'"title="Ativar">Ativar</a> |';
+        } else {
+            echo '<a href="?action=2&&id='.$post['id'].'" title="Desativar">Desativar</a> |';
+        }
+        ?>
+		<a href="edit-post.php?id=<?php echo $post['id']; ?>" title="Editar">Editar</a> |
+		<a href="?action=3&&id=<?php echo $post['id'];?>" title="Deletar">Deletar</a>
 	</p>
-
-	<?php endfor; ?>
-
+    <?php endforeach; ?>
 </body>
 </html>

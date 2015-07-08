@@ -21,14 +21,14 @@
 	<hr>
     <?php
         if(isset($_POST["publicar"])){
-            $form['titulo']     = strip_tags(trim($_POST['titulo']));//strip_tags = retira as tags html
-            $form['autor']      = strip_tags(trim($_POST['autor']));//strip_tags = retira as tags html
-            $form['status']     = strip_tags(trim($_POST['status']));//strip_tags = retira as tags html
+            $form['titulo']     = DBEscape(strip_tags(trim($_POST['titulo'])));//strip_tags = retira as tags html
+            $form['autor']      = DBEscape(strip_tags(trim($_POST['autor'])));//strip_tags = retira as tags html
+            $form['status']     = DBEscape(strip_tags(trim($_POST['status'])));//strip_tags = retira as tags html
             $form['data']       = date('Y-m-d H:i:s');
-            $form['conteudo']   = trim($_POST['conteudo']);//strip_tags = retira as tags html
-
-
-            $form               = DBEscape($form);
+            $form['conteudo']   = str_replace('\r\n', "\n", DBEscape(strip_tags(trim($_POST['conteudo']))));
+            //str_replace = substitui um caracter por outro em uma string //
+            //DBEscape = retira o que pode dar errado em um Database e protege contra mysql Inject
+            //strip_tags = retira as tags html
 
             if(empty($form['titulo'])){ echo "Preencha o campo Titulo";
             }elseif(empty($form['autor'])){ echo "Preencha o campo Autor";
